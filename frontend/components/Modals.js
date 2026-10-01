@@ -117,6 +117,17 @@ export const TaskModal = ({ task, onClose, onSubmit }) => {
 
 // 4. Resource Viewer Modal
 export const ResourceModal = ({ resource, onClose, onComplete }) => {
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11)
+      ? `https://www.youtube.com/embed/${match[2]}`
+      : null;
+  };
+
+  const ytEmbed = getYouTubeEmbedUrl(resource.url);
+
   return React.createElement('div', {
     className: 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm'
   },
@@ -137,6 +148,15 @@ export const ResourceModal = ({ resource, onClose, onComplete }) => {
       ),
 
       React.createElement('div', { className: 'my-6 space-y-4' },
+        ytEmbed && React.createElement('div', { className: 'relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-black' },
+          React.createElement('iframe', {
+            src: ytEmbed,
+            title: resource.title,
+            allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+            allowFullScreen: true,
+            className: 'w-full h-full border-0'
+          })
+        ),
         React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' }, resource.description),
         resource.url && React.createElement('div', { className: 'p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center justify-between' },
           React.createElement('div', null,
