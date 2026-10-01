@@ -318,8 +318,22 @@ export const connectDB = async () => {
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     return true;
   } catch (err) {
-    console.log('ℹ️ Local MongoDB instance not reachable, activating CodeQuest In-Memory Document Store with auto-persistence.');
-    const storePath = path.join(__dirname, '../data/store.json');
+    console.log('ℹ️ MongoDB instance not reachable, activating CodeQuest In-Memory Document Store with auto-persistence.');
+    const storePath = process.env.VERCEL
+      ? '/tmp/store.json'
+      : path.join(__dirname, '../data/store.json');
+
+    if (process.env.VERCEL && !fs.existsSync(storePath)) {
+      try {
+        const seedPath = path.join(__dirname, '../data/store.json');
+        if (fs.existsSync(seedPath)) {
+          fs.writeFileSync(storePath, fs.readFileSync(seedPath, 'utf8'));
+        }
+      } catch (e) {
+        console.warn('Could not initialize /tmp/store.json:', e.message);
+      }
+    }
+
     fallbackStore = new JSONStore(storePath);
     isConnected = false;
     return false;
@@ -331,7 +345,9 @@ export const getModel = (modelName, mongooseModel) => {
     return mongooseModel;
   }
   if (!fallbackStore) {
-    const storePath = path.join(__dirname, '../data/store.json');
+    const storePath = process.env.VERCEL
+      ? '/tmp/store.json'
+      : path.join(__dirname, '../data/store.json');
     fallbackStore = new JSONStore(storePath);
   }
   return new MemoryModel(modelName, fallbackStore);

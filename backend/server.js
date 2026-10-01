@@ -74,6 +74,13 @@ const startServer = async () => {
   });
 };
 
-startServer().catch(err => {
-  console.error('Failed to start CodeQuest server:', err);
-});
+if (!process.env.VERCEL) {
+  startServer().catch(err => {
+    console.error('Failed to start CodeQuest server:', err);
+  });
+} else {
+  // Pre-warm DB on serverless invocation
+  connectDB().then(() => runFullSeed()).catch(console.error);
+}
+
+export default app;
