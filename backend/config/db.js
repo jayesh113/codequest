@@ -299,6 +299,10 @@ class JSONStore {
 
   persist() {
     try {
+      const dir = path.dirname(this.filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
       fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2), 'utf8');
     } catch (err) {
       console.error('Failed to persist store:', err.message);
