@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeQuest — Gamified Coding Academy & Student Community</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b'
+            },
+            cyber: {
+              bg: '#0A0D17',
+              card: '#111726',
+              cardHover: '#182033',
+              border: '#1E293B',
+              accent: '#06B6D4',
+              glow: '#8B5CF6',
+              success: '#10B981',
+              warning: '#F59E0B',
+              danger: '#EF4444'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['Fira Code', 'JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body class="bg-[#0A0D17] text-slate-100 font-sans min-h-screen selection:bg-brand-500 selection:text-white transition-colors duration-200">
+  <div id="root">
+    <!-- Initial Loading State -->
+    <div class="min-h-screen flex items-center justify-center flex-col gap-4">
+      <div class="relative w-16 h-16">
+        <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-500 to-cyber-accent animate-spin opacity-75 blur-sm"></div>
+        <div class="absolute inset-1 rounded-lg bg-[#0A0D17] flex items-center justify-center">
+          <span class="text-2xl font-black text-brand-400">CQ</span>
+        </div>
+      </div>
+      <p class="text-slate-400 text-sm font-medium animate-pulse">Initializing CodeQuest Platform...</p>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
