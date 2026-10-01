@@ -287,14 +287,88 @@ class JSONStore {
     try {
       if (fs.existsSync(this.filePath)) {
         const raw = fs.readFileSync(this.filePath, 'utf8');
-        this.data = JSON.parse(raw);
-      } else {
-        this.data = {};
-        this.persist();
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.User) && parsed.User.length > 0) {
+          this.data = parsed;
+          return;
+        }
       }
     } catch (err) {
-      this.data = {};
+      console.warn('Failed to parse existing store:', err.message);
     }
+
+    // Attempt to load from pre-seeded store.json
+    this.data = this.getSeedData();
+    this.persist();
+  }
+
+  getSeedData() {
+    const possiblePaths = [
+      path.join(__dirname, '../data/store.json'),
+      path.join(process.cwd(), 'backend/data/store.json'),
+      path.join(process.cwd(), 'data/store.json'),
+      path.resolve('backend/data/store.json'),
+      path.resolve('data/store.json')
+    ];
+
+    for (const p of possiblePaths) {
+      try {
+        if (fs.existsSync(p)) {
+          const raw = fs.readFileSync(p, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.User) && parsed.User.length > 0) {
+            console.log(`✅ Loaded seed data from: ${p} (${parsed.User.length} users)`);
+            return parsed;
+          }
+        }
+      } catch (e) {}
+    }
+
+    console.warn('⚠️ No pre-seeded store.json found on disk. Initializing embedded seed users.');
+    return {
+      User: [
+        {
+          _id: 'admin_marcus_vance',
+          name: 'Prof. Marcus Vance',
+          email: 'admin@codequest.dev',
+          passwordHash: '$2a$10$x0VEGuxumTAk7wAbc4GU3OqGhA7WFbDsvWhncevrpdpOD9Ie9ex4O',
+          role: 'admin',
+          avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Marcus',
+          interests: ['Systems', 'Algorithms', 'Compilers', 'Education']
+        },
+        {
+          _id: 'student_alex_river',
+          name: 'Alex River',
+          email: 'student@codequest.dev',
+          passwordHash: '$2a$10$x0VEGuxumTAk7wAbc4GU3OqGhA7WFbDsvWhncevrpdpOD9Ie9ex4O',
+          role: 'student',
+          avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex',
+          interests: ['Python', 'DSA', 'Web Dev', 'React']
+        }
+      ],
+      Profile: [
+        {
+          _id: 'prof_admin_marcus',
+          userId: 'admin_marcus_vance',
+          bio: 'Lead Instructor and CodeQuest Community Architect.',
+          level: 15,
+          currentXP: 12500,
+          streakCount: 45,
+          solvedCount: 120,
+          tasksCompletedCount: 85
+        },
+        {
+          _id: 'prof_student_alex',
+          userId: 'student_alex_river',
+          bio: 'Aspiring Full Stack Engineer. Love Python, React, and solving daily challenges.',
+          level: 4,
+          currentXP: 720,
+          streakCount: 12,
+          solvedCount: 18,
+          tasksCompletedCount: 14
+        }
+      ]
+    };
   }
 
   persist() {
@@ -322,17 +396,6 @@ export const connectDB = async () => {
     const storePath = process.env.VERCEL
       ? '/tmp/store.json'
       : path.join(__dirname, '../data/store.json');
-
-    if (process.env.VERCEL && !fs.existsSync(storePath)) {
-      try {
-        const seedPath = path.join(__dirname, '../data/store.json');
-        if (fs.existsSync(seedPath)) {
-          fs.writeFileSync(storePath, fs.readFileSync(seedPath, 'utf8'));
-        }
-      } catch (e) {
-        console.warn('Could not initialize /tmp/store.json:', e.message);
-      }
-    }
 
     fallbackStore = new JSONStore(storePath);
     isConnected = false;

@@ -72,6 +72,11 @@ const App = () => {
       if (meRes) {
         setUser(meRes.user);
         setProfile(meRes.profile);
+      } else {
+        API.setToken(null);
+        API.setUser(null);
+        setUser(null);
+        setProfile(null);
       }
       if (dashRes) {
         setDashboardData(dashRes);
